@@ -4,3 +4,12 @@
 % Descripción: 50 ejercicios 
 % ===============================================
 
+% -------- Código 3 Resta de dos números ------------ section .data num1 db 7 ; Primer número (minuendo) num2 db 3 ; Segundo número (sustraendo) resultado db 0 ; Variable para almacenar el resultado
+
+section .text global _start
+
+_start: ; Cargar los números en los registros mov al, [num1] ; Cargar el primer número en el registro AL sub al, [num2] ; Restar el segundo número de AL (al = al - num2)
+
+; Guardar el resultado en la variable
+
+% -------------------------------------------
