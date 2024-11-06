@@ -1,0 +1,31 @@
+% =============================================== 
+% Autor: De La Teja Gonzalez Miguel Adolfo 
+% Fecha: 6 de Noviembre de 2024 
+% Descripción: 50 ejercicios 
+% ===============================================
+
+% -------- Código 1 Convertir temperatura de Celsius a Fahrenhei ------------
+
+section .data celsius db 25 ; temperatura en Celsius (por ejemplo, 25°C) result db 0 ; espacio para almacenar el resultado en Fahrenheit msg db "Temperatura en Fahrenheit: ", 0
+
+section .bss
+
+section .text global _start
+
+_start: ; Cargar el valor de Celsius en el registro AL mov al, [celsius] ; AL = celsius
+
+; Multiplicar Celsius por 9 mov bl, 9 ; cargar 9 en BL mul bl ; AX = AL * BL = Celsius * 9
+
+; Dividir el resultado entre 5 mov bl, 5 ; cargar 5 en BL div bl ; AL = AX / BL = (Celsius * 9) / 5
+
+; Sumar 32 al resultado para completar la fórmula add al, 32 ; AL = AL + 32
+
+; Guardar el resultado en la variable result mov [result], al ; result = AL
+
+; Imprimir el resultado mov eax, 4 ; syscall número 4 (sys_write) mov ebx, 1 ; salida estándar mov ecx, msg ; dirección del mensaje mov edx, 24 ; longitud del mensaje int 0x80 ; llamada al sistema
+
+; Imprimir el valor de la temperatura en Fahrenheit mov eax, 4 ; syscall número 4 (sys_write) mov ebx, 1 ; salida estándar mov ecx, result ; dirección del resultado mov edx, 1 ; longitud del resultado int 0x80 ; llamada al sistema
+
+; Salir del programa mov eax, 1 ; syscall número 1 (sys_exit) xor ebx, ebx ; código de salida 0 int 0x80 ; llamada al sistema
+
+% -------------------------------------------
