@@ -4,22 +4,37 @@
 % Descripción: 50 ejercicios 
 % ===============================================
 
-% -------- Código 5 Division de dos números ------------ section .data divisor dd 5 ; Divisor (ejemplo: 5) dividendo dd 20 ; Dividendo (ejemplo: 20)
+% -------- Código 5 Division de dos números ------------ 
+section .data
+    divisor dd 5          ; Divisor (ejemplo: 5)
+    dividendo dd 20       ; Dividendo (ejemplo: 20)
 
-section .bss resultado resd 1 ; Espacio para el resultado de la división residuo resd 1 ; Espacio para el residuo (módulo)
+section .bss
+    resultado resd 1      ; Espacio para el resultado de la división
+    residuo resd 1        ; Espacio para el residuo (módulo)
 
-section .text global _start
+section .text
+    global _start
 
-_start: ; Cargar el dividendo en EAX mov eax, [dividendo] ; EAX = dividendo
+_start:
+    ; Cargar el dividendo en EAX
+    mov eax, [dividendo]   ; EAX = dividendo
 
-; Cargar el divisor en ECX mov ecx, [divisor] ; ECX = divisor
+    ; Cargar el divisor en ECX
+    mov ecx, [divisor]     ; ECX = divisor
 
-; Preparar EDX para la división (debe estar en 0 para evitar restos anteriores) xor edx, edx ; Limpiar EDX (EDX:EAX es el valor que se va a dividir)
+    ; Preparar EDX para la división (debe estar en 0 para evitar restos anteriores)
+    xor edx, edx           ; Limpiar EDX (EDX:EAX es el valor que se va a dividir)
 
-; Dividir EDX:EAX entre ECX div ecx ; EAX = cociente, EDX = residuo
+    ; Dividir EDX:EAX entre ECX
+    div ecx                ; EAX = cociente, EDX = residuo
 
-; Guardar el resultado de la división y el residuo mov [resultado], eax ; Guardar el cociente en resultado mov [residuo], edx ; Guardar el residuo en residuo
+    ; Guardar el resultado de la división y el residuo
+    mov [resultado], eax   ; Guardar el cociente en resultado
+    mov [residuo], edx     ; Guardar el residuo en residuo
 
-; Finalizar el programa mov eax, 1 ; Llamada al sistema para salida int 0x80 ; Interrupción del sistema (para salir en Linux)
+    ; Finalizar el programa
+    mov eax, 1             ; Llamada al sistema para salida
+    int 0x80               ; Interrupción del sistema (para salir en Linux)
 
 % -------------------------------------------
