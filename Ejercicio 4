@@ -4,3 +4,12 @@
 % Descripción: 50 ejercicios 
 % ===============================================
 
+% -------- Código 4 Multiplicación de dos números ------------ section .data num1 dd 5 ; Primer número a multiplicar (por ejemplo, 5) num2 dd 10 ; Segundo número a multiplicar (por ejemplo, 10) result dd 0 ; Variable para almacenar el resultado
+
+section .text global _start
+
+_start: mov eax, [num1] ; Cargar el primer número en el registro EAX imul eax, [num2] ; Multiplicar EAX por el segundo número (num2) ; El resultado se almacena en EAX mov [result], eax ; Guardar el resultado en la variable "result"
+
+; Salida del programa (sys_exit) mov eax, 1 ; Código de sistema para salida (sys_exit) int 0x80 ; Llamada a la interrupción del sistema
+
+% -------------------------------------------
