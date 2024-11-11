@@ -5,3 +5,43 @@
 % ===============================================
 
 % -------- Encontrar el máximo en un arreglo	------------
+
+section .data
+    array dd 5, 3, 8, 1, 9, 6      ; Define un arreglo con algunos elementos
+    length equ 6                   ; Longitud del arreglo
+
+section .bss
+    max resd 1                     ; Espacio para almacenar el máximo
+
+section .text
+    global _start
+
+_start:
+    ; Inicializar registros
+    mov ecx, length                ; Cargar la longitud del arreglo en ECX (contador)
+    mov esi, array                 ; Cargar la dirección base del arreglo en ESI
+    mov eax, [esi]                 ; Cargar el primer elemento del arreglo en EAX (valor máximo inicial)
+    add esi, 4                     ; Mover ESI al siguiente elemento (cada elemento es de 4 bytes)
+
+find_max:
+    cmp ecx, 1                     ; Verificar si quedan elementos
+    jle end                        ; Si no quedan elementos, terminar
+
+    mov ebx, [esi]                 ; Cargar el siguiente elemento en EBX
+    cmp eax, ebx                   ; Comparar el máximo actual con el nuevo valor
+    jge skip                       ; Si EAX >= EBX, saltar
+
+    mov eax, ebx                   ; Si encontramos un valor mayor, almacenar en EAX
+
+skip:
+    add esi, 4                     ; Mover al siguiente elemento en el arreglo
+    dec ecx                        ; Disminuir el contador
+    jmp find_max                   ; Repetir el bucle
+
+end:
+    mov [max], eax                 ; Guardar el valor máximo encontrado en la variable "max"
+
+    ; Salir del programa
+    mov eax, 1                     ; Código de salida del sistema
+    mov ebx, 0                     ; Código de retorno
+    int 0x80                       ; Llamada al sistema para salir
