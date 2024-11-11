@@ -5,3 +5,59 @@
 % ===============================================
 
 % -------- Ordenamiento por selección	------------
+
+section .data
+    ; Array desordenado que vamos a ordenar
+    array db 64, 25, 12, 22, 11, 90   ; Array de 6 elementos
+    array_size equ 6                   ; Tamaño del array
+
+section .bss
+    min_index resb 1   ; Para almacenar el índice del valor mínimo encontrado
+    i resb 1           ; Índice externo del array (para el bucle externo)
+    j resb 1           ; Índice interno del array (para el bucle interno)
+
+section .text
+    global _start
+
+_start:
+    mov byte [i], 0                   ; Inicializa i = 0
+
+outer_loop:
+    cmp byte [i], array_size - 1      ; Verifica si i < array_size - 1
+    jge end_sorting                   ; Si i >= array_size - 1, salimos
+
+    mov byte [min_index], [i]         ; min_index = i
+
+    mov byte [j], [i]
+    inc byte [j]                      ; j = i + 1
+
+inner_loop:
+    cmp byte [j], array_size          ; Verifica si j < array_size
+    jge swap_elements                 ; Si j >= array_size, pasamos al intercambio
+
+    ; Compara array[j] con array[min_index]
+    mov al, [array + j]
+    mov bl, [array + min_index]
+    cmp al, bl
+    jge skip_update_min               ; Si array[j] >= array[min_index], saltamos
+
+    mov byte [min_index], [j]         ; Actualizamos min_index con j
+
+skip_update_min:
+    inc byte [j]
+    jmp inner_loop                    ; Repetimos el bucle interno
+
+swap_elements:
+    ; Intercambia array[i] y array[min_index]
+    mov al, [array + i]
+    mov bl, [array + min_index]
+    mov [array + min_index], al
+    mov [array + i], bl
+
+    inc byte [i]                      ; Incrementa i para el siguiente ciclo
+    jmp outer_loop                    ; Repetimos el bucle externo
+
+end_sorting:
+    ; Salida al sistema operativo
+    mov eax, 1                        ; syscall: sys_exit
+    int 0x80                          ; Llamada al sistema operativo
