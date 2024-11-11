@@ -5,3 +5,43 @@
 % ===============================================
 
 % -------- Encontrar el mínimo en un arreglo	------------
+
+section .data
+    array db 5, 2, 9, 1, 6  ; Definimos el arreglo de 5 elementos
+    array_len equ 5         ; Tamaño del arreglo
+
+section .bss
+    min resb 1              ; Variable para almacenar el mínimo
+
+section .text
+    global _start
+
+_start:
+    ; Inicializar los registros
+    mov ecx, array_len      ; Cargar el tamaño del arreglo en ECX (contador)
+    mov esi, array          ; Cargar la dirección base del arreglo en ESI
+    mov al, [esi]           ; Cargar el primer elemento del arreglo en AL (valor mínimo inicial)
+    mov [min], al           ; Guardar el valor mínimo inicial
+
+    ; Bucle para encontrar el mínimo
+find_min:
+    inc esi                 ; Avanzar al siguiente elemento
+    dec ecx                 ; Disminuir el contador
+    jz end_loop             ; Si ECX es 0, terminamos el bucle
+
+    mov al, [esi]           ; Cargar el siguiente elemento del arreglo en AL
+    cmp al, [min]           ; Comparar el valor actual con el mínimo encontrado
+    jge skip                ; Si AL >= min, saltar
+    mov [min], al           ; Si AL < min, actualizar el mínimo
+
+skip:
+    jmp find_min            ; Repetir el bucle
+
+end_loop:
+    ; Aquí puedes hacer lo que necesites con el valor mínimo encontrado,
+    ; en este caso, simplemente terminamos el programa.
+
+    ; Salida del programa (syscall de Linux para exit)
+    mov eax, 1              ; Código de syscall para exit
+    xor ebx, ebx            ; Código de salida 0
+    int 0x80                ; Interrupción de llamada al sistema
