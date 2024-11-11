@@ -5,3 +5,56 @@
 % ===============================================
 
 % -------- Ordenamiento burbuja	------------
+
+section .data
+    ; Definimos un arreglo de ejemplo y su tamaño
+    arreglo db 5, 3, 8, 4, 2    ; Arreglo a ordenar
+    tamano equ $-arreglo        ; Tamaño del arreglo
+
+section .bss
+    ; Variables temporales para los índices y bandera de intercambio
+    i resb 1
+    j resb 1
+    swap_flag resb 1
+
+section .text
+    global _start
+
+_start:
+    mov ecx, tamano             ; Cargar tamaño del arreglo en ecx
+    dec ecx                     ; Reducir tamaño en 1 para los límites
+
+ordenar:
+    mov byte [swap_flag], 0     ; Inicializamos la bandera de intercambio a 0 (sin intercambio)
+
+    movzx esi, byte [i]         ; Inicializamos i = 0
+    cmp esi, ecx                ; Mientras i < tamano - 1
+    jge fin_ordenamiento        ; Si ya no quedan más comparaciones, terminamos el ordenamiento
+
+    movzx edi, byte [j]         ; Inicializamos j = 0
+
+    inner_loop:
+        mov al, [arreglo + edi] ; Cargar arreglo[j] en al
+        mov bl, [arreglo + edi + 1] ; Cargar arreglo[j + 1] en bl
+
+        cmp al, bl              ; Comparar arreglo[j] con arreglo[j + 1]
+        jbe no_swap             ; Si arreglo[j] <= arreglo[j + 1], no hay intercambio
+
+        ; Realizar el intercambio
+        mov [arreglo + edi], bl ; arreglo[j] = arreglo[j + 1]
+        mov [arreglo + edi + 1], al ; arreglo[j + 1] = arreglo[j]
+        mov byte [swap_flag], 1 ; Cambiar la bandera a 1, indicando un intercambio
+
+    no_swap:
+        inc edi                 ; Incrementar j
+        cmp edi, ecx            ; Comparar j con el límite de comparación (tamano - 1)
+        jl inner_loop           ; Repetir el bucle interno si j < tamano - 1
+
+    inc byte [i]                ; Incrementar i
+    cmp byte [swap_flag], 1     ; Revisar si hubo algún intercambio
+    je ordenar                  ; Si se realizó un intercambio, repetir el bucle de ordenamiento
+
+fin_ordenamiento:
+    ; Fin del programa: terminamos la ejecución
+    mov eax, 1                  ; Llamada al sistema para salida
+    int 0x80                    ; Interrupción para terminar el programa
