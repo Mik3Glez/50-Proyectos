@@ -5,3 +5,79 @@
 % ===============================================
 
 % -------- Verificar si una cadena es palíndromo	------------
+
+section .data
+    mensaje_input db "Ingrese una cadena: ", 0
+    mensaje_si_palindromo db "Es un palindromo.", 0
+    mensaje_no_palindromo db "No es un palindromo.", 0
+    buffer db 100                ; Espacio para la entrada de la cadena (100 caracteres como máximo)
+
+section .bss
+    longitud resb 1              ; Para almacenar la longitud de la cadena
+
+section .text
+    global _start
+
+_start:
+    ; Mostrar mensaje para pedir la cadena
+    mov eax, 4                   ; syscall sys_write
+    mov ebx, 1                   ; fd stdout
+    mov ecx, mensaje_input
+    mov edx, 18                  ; longitud del mensaje
+    int 0x80                     ; llamada al sistema
+
+    ; Leer la cadena del usuario
+    mov eax, 3                   ; syscall sys_read
+    mov ebx, 0                   ; fd stdin
+    mov ecx, buffer              ; dirección de almacenamiento de la cadena
+    mov edx, 100                 ; tamaño máximo
+    int 0x80                     ; llamada al sistema
+
+    ; Calcular longitud de la cadena (sin contar el salto de línea)
+    mov ecx, buffer              ; inicio de la cadena
+    mov edi, 0                   ; contador de longitud
+find_length:
+    cmp byte [ecx + edi], 10     ; verificar si es salto de línea (enter)
+    je got_length                ; si es salto de línea, terminamos
+    inc edi                      ; incrementar el contador
+    jmp find_length
+got_length:
+    dec edi                      ; restar uno para eliminar el enter
+    mov [longitud], edi          ; almacenar la longitud
+
+    ; Comparar caracteres desde los extremos hacia el centro
+    mov esi, buffer              ; puntero al inicio de la cadena
+    mov edi, buffer              ; puntero al final de la cadena
+    add edi, [longitud]          ; mover al último carácter
+
+check_palindrome:
+    mov al, [esi]                ; cargar caracter del inicio
+    mov bl, [edi]                ; cargar caracter del final
+    cmp al, bl                   ; comparar caracteres
+    jne not_palindrome           ; si no son iguales, no es palíndromo
+    inc esi                      ; avanzar desde el inicio
+    dec edi                      ; retroceder desde el final
+    cmp esi, edi                 ; si se encuentran o cruzan, termina
+    jle check_palindrome         ; seguir comparando si no han cruzado
+
+    ; Es palíndromo, mostrar mensaje
+    mov eax, 4                   ; syscall sys_write
+    mov ebx, 1                   ; fd stdout
+    mov ecx, mensaje_si_palindromo
+    mov edx, 17                  ; longitud del mensaje
+    int 0x80                     ; llamada al sistema
+    jmp end                      ; terminar programa
+
+not_palindrome:
+    ; No es palíndromo, mostrar mensaje
+    mov eax, 4                   ; syscall sys_write
+    mov ebx, 1                   ; fd stdout
+    mov ecx, mensaje_no_palindromo
+    mov edx, 19                  ; longitud del mensaje
+    int 0x80                     ; llamada al sistema
+
+end:
+    ; Terminar programa
+    mov eax, 1                   ; syscall sys_exit
+    xor ebx, ebx                 ; código de salida 0
+    int 0x80                     ; llamada al sistema
