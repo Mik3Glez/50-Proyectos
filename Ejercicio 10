@@ -5,3 +5,56 @@
 % ===============================================
 
 % -------- Invertir una cadena	------------
+
+section .data
+    cadena db "Hola, mundo!", 0  ; Cadena a invertir, el '0' marca el final (como null-terminated en C)
+    longitud db 0                 ; Para almacenar la longitud de la cadena
+
+section .bss
+    cadena_invertida resb 100     ; Reserva espacio para la cadena invertida
+
+section .text
+    global _start
+
+_start:
+    ; Calcular la longitud de la cadena
+    mov rsi, cadena        ; Puntero a la cadena original
+    xor rcx, rcx           ; Contador para longitud (cx es un registro de tamaño reducido)
+    mov al, 0              ; Carácter nulo para comparación
+.longitud_loop:
+    cmp byte [rsi + rcx], al  ; Compara cada carácter con 0 (fin de cadena)
+    je .invertir_cadena       ; Si es el final, pasa a invertir
+    inc rcx                    ; Aumenta la longitud
+    jmp .longitud_loop         ; Repite hasta encontrar el final
+
+.invertir_cadena:
+    dec rcx                    ; Ajusta la longitud para que apunte al último carácter
+    mov byte [longitud], cl    ; Guarda la longitud en 'longitud'
+    
+    ; Invertir la cadena
+    mov rdi, cadena_invertida  ; Puntero a la cadena invertida
+    mov rsi, cadena            ; Puntero a la cadena original
+    
+.invertir_loop:
+    mov al, [rsi + rcx]        ; Obtiene el carácter desde el final de la cadena original
+    mov [rdi], al              ; Coloca el carácter en la cadena invertida
+    dec rcx                    ; Retrocede en la cadena original
+    inc rdi                    ; Avanza en la cadena invertida
+    cmp rcx, -1                ; Si rcx es -1, se ha invertido toda la cadena
+    jne .invertir_loop         ; Si no es -1, repite
+
+    ; Agregar el carácter nulo al final de la cadena invertida
+    mov byte [rdi], 0
+
+    ; Mostrar la cadena invertida
+    mov rax, 1                 ; syscall: write
+    mov rdi, 1                 ; salida: stdout
+    mov rsi, cadena_invertida  ; dirección de la cadena invertida
+    mov rdx, [longitud]        ; longitud de la cadena invertida
+    add rdx, 1                 ; +1 para incluir el carácter nulo
+    syscall                    ; llamada al sistema para escribir en stdout
+
+    ; Salir del programa
+    mov rax, 60                ; syscall: exit
+    xor rdi, rdi               ; estado de salida: 0
+    syscall                    ; llamada al sistema para salir
