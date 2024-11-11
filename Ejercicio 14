@@ -5,3 +5,40 @@
 % ===============================================
 
 % -------- Búsqueda lineal	------------
+
+section .data
+    arreglo db 5, 10, 15, 20, 25  ; Arreglo de números a buscar
+    n_elementos equ 5             ; Número de elementos en el arreglo
+    valor_a_buscar db 15          ; Valor que queremos encontrar
+    resultado db -1               ; Resultado: índice del valor encontrado (-1 si no lo encuentra)
+
+section .text
+    global _start
+
+_start:
+    ; Inicializamos registros
+    mov ecx, 0                    ; ECX será el índice
+    mov al, [valor_a_buscar]       ; Cargamos el valor que queremos buscar en AL
+
+buscar:
+    ; Comparamos el valor en el índice actual con el valor buscado
+    cmp al, [arreglo + ecx]        ; Compara AL con el valor actual en el arreglo
+    je encontrado                 ; Si es igual, salta a "encontrado"
+
+    ; Incrementamos el índice
+    inc ecx
+    cmp ecx, n_elementos           ; Comparamos índice con el tamaño del arreglo
+    jl buscar                     ; Si no hemos terminado el arreglo, saltamos a buscar
+
+    ; No encontrado, dejamos -1 en resultado y terminamos
+    jmp fin
+
+encontrado:
+    ; Guardamos el índice en "resultado" si se encontró el valor
+    mov [resultado], cl            ; Guardamos el índice en resultado
+
+fin:
+    ; Salimos del programa (por simplicidad en Linux)
+    mov eax, 60                    ; Código de salida para el syscall de Linux
+    xor edi, edi                   ; Código de salida 0
+    syscall                        ; Llamada al sistema para salir
