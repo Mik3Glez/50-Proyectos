@@ -5,3 +5,118 @@
 % ===============================================
 
 % -------- Ordenamiento por mezcla (Merge Sort)	------------
+
+section .data
+arr db 9, 3, 1, 5, 13, 12, 7, 4 ; Arreglo desordenado para ordenar
+n equ ($ - arr)                  ; Tamaño del arreglo
+
+section .bss
+temp resb n                       ; Arreglo temporal para la mezcla
+
+section .text
+global _start
+
+_start:
+    ; Llamamos a merge_sort con el arreglo, inicio en 0 y final en n - 1
+    mov eax, arr                  ; Dirección base del arreglo
+    xor ebx, ebx                  ; Inicio (0)
+    mov ecx, n                    ; Fin (n - 1)
+    dec ecx
+    call merge_sort
+
+    ; Termina el programa (llamada a exit)
+    mov eax, 1                    ; Llamada al sistema para salir
+    xor ebx, ebx                  ; Código de salida 0
+    int 0x80
+
+merge_sort:
+    push ebp
+    mov ebp, esp
+
+    ; Revisamos si inicio < final
+    mov eax, ebx                  ; eax = inicio
+    cmp eax, ecx
+    jge end_merge_sort            ; Si inicio >= final, regresar
+
+    ; Calculamos la mitad (mitad = (inicio + final) / 2)
+    mov edx, ebx                  ; edx = inicio
+    add edx, ecx                  ; edx += final
+    shr edx, 1                    ; mitad = (inicio + final) / 2
+
+    ; Llamada recursiva para merge_sort(arr, inicio, mitad)
+    push ecx                      ; Guardamos final
+    push edx                      ; Guardamos mitad
+    call merge_sort
+    add esp, 4                    ; Limpiamos mitad de la pila
+
+    ; Llamada recursiva para merge_sort(arr, mitad + 1, final)
+    pop ebx                       ; Restauramos inicio (mitad)
+    inc ebx                       ; inicio = mitad + 1
+    call merge_sort
+    pop ebx                       ; Restauramos inicio original
+
+    ; Llamada a merge(arr, inicio, mitad, final)
+    push ecx                      ; Guardamos final
+    push edx                      ; Guardamos mitad
+    call merge
+    add esp, 8                    ; Limpiamos final y mitad de la pila
+
+end_merge_sort:
+    pop ebp
+    ret
+
+merge:
+    push ebp
+    mov ebp, esp
+
+    ; Guardamos los parámetros inicio, mitad, final
+    mov esi, [ebp+8]              ; esi = inicio
+    mov edi, [ebp+12]             ; edi = mitad
+    mov ebx, [ebp+16]             ; ebx = final
+
+    ; Inicializamos los índices para la mezcla
+    mov eax, esi                  ; i = inicio
+    mov edx, edi                  ; j = mitad + 1
+    inc edx
+    mov ecx, esi                  ; k = inicio
+
+merge_loop:
+    ; Comparamos y copiamos el menor elemento en temp
+    cmp eax, edi                  ; i <= mitad?
+    jg copy_from_right            ; Si no, copiar desde derecha
+
+    cmp edx, ebx                  ; j <= final?
+    jg copy_from_left             ; Si no, copiar desde izquierda
+
+    ; Comparar arr[i] con arr[j]
+    mov al, [arr + eax]           ; al = arr[i]
+    cmp al, [arr + edx]           ; comparar arr[i] con arr[j]
+    jle copy_from_left            ; Si arr[i] <= arr[j], copiar arr[i]
+
+copy_from_right:
+    mov al, [arr + edx]           ; al = arr[j]
+    mov [temp + ecx], al          ; temp[k] = arr[j]
+    inc edx                       ; j++
+    jmp advance_merge
+
+copy_from_left:
+    mov al, [arr + eax]           ; al = arr[i]
+    mov [temp + ecx], al          ; temp[k] = arr[i]
+    inc eax                       ; i++
+
+advance_merge:
+    inc ecx                       ; k++
+    cmp ecx, ebx
+    jle merge_loop
+
+    ; Copiamos temp de regreso a arr
+    mov eax, esi                  ; eax = inicio
+copy_back:
+    mov al, [temp + eax]
+    mov [arr + eax], al
+    inc eax
+    cmp eax, ebx
+    jle copy_back
+
+    pop ebp
+    ret
