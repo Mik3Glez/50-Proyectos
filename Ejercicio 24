@@ -5,3 +5,31 @@
 % ===============================================
 
 % -------- Calcular la longitud de una cadena		------------
+
+section .data
+    cadena db "Hola, mundo!", 0   ; La cadena termina con un carácter nulo
+
+section .bss
+    longitud resb 1                ; Variable para almacenar la longitud
+
+section .text
+    global _start
+
+_start:
+    mov rsi, cadena                ; rsi apunta al inicio de la cadena
+    mov rcx, 0                     ; rcx almacenará la longitud
+
+contar:
+    cmp byte [rsi], 0              ; Comparar el carácter actual con 0 (carácter nulo)
+    je fin                         ; Si es 0, salimos del bucle
+    inc rsi                        ; Apuntar al siguiente carácter
+    inc rcx                        ; Incrementar la longitud
+    jmp contar                     ; Repetir el proceso
+
+fin:
+    mov [longitud], cl             ; Guardar el resultado en la variable 'longitud'
+
+    ; Salida del programa
+    mov rax, 60                    ; Código de salida del sistema para "exit"
+    xor rdi, rdi                   ; Código de salida 0
+    syscall                        ; Llamada al sistema para salir
