@@ -5,3 +5,39 @@
 % ===============================================
 
 % -------- Conversión de ASCII a entero		------------
+
+section .data
+    ascii_num db "1234", 0 ; Cadena ASCII que representa el número
+    length    equ 4        ; Longitud de la cadena
+
+section .bss
+    result resd 1          ; Reservar espacio para el resultado
+
+section .text
+    global _start
+
+_start:
+    mov esi, ascii_num     ; Apuntar ESI al inicio de la cadena ASCII
+    xor eax, eax           ; Limpiar EAX (donde se almacenará el resultado)
+    xor ecx, ecx           ; Contador para el bucle (posiciones de los dígitos)
+
+convert_ascii_to_int:
+    movzx ebx, byte [esi + ecx] ; Cargar el siguiente carácter en EBX
+    cmp bl, 0                   ; Verificar si es el final de la cadena (carácter nulo)
+    je end_conversion           ; Si es el final, sal del bucle
+
+    sub bl, '0'                 ; Convertir de ASCII a valor numérico
+    imul eax, eax, 10           ; Multiplicar el acumulador (EAX) por 10
+    add eax, ebx                ; Sumar el dígito actual al acumulador
+
+    inc ecx                     ; Incrementar el índice de la cadena
+    jmp convert_ascii_to_int    ; Repetir el bucle
+
+end_conversion:
+    mov [result], eax           ; Guardar el resultado en la variable result
+
+    ; Salida (sólo para propósitos de demostración, depende del sistema operativo)
+
+    mov eax, 1                  ; syscall número para exit en Linux
+    xor ebx, ebx                ; Código de salida 0
+    int 0x80                    ; Llamada al sistema para salir
