@@ -5,3 +5,36 @@
 % ===============================================
 
 % -------- Operaciones AND, OR, XOR a nivel de bits			------------
+
+section .data
+    ; Definimos los valores de ejemplo
+    valor1 dd 0xF0F0F0F0      ; Primer valor hexadecimal en memoria
+    valor2 dd 0x0F0F0F0F      ; Segundo valor hexadecimal en memoria
+
+section .text
+global _start
+
+_start:
+    ; Cargamos los valores en los registros eax y ebx
+    mov eax, [valor1]          ; Cargar el primer valor en eax
+    mov ebx, [valor2]          ; Cargar el segundo valor en ebx
+
+    ; AND: Realizamos la operación AND a nivel de bits
+    mov ecx, eax               ; Guardamos el valor de eax en ecx para no perderlo
+    and eax, ebx               ; eax = eax AND ebx
+    ; Resultado de AND está ahora en eax
+
+    ; OR: Realizamos la operación OR a nivel de bits
+    mov eax, ecx               ; Restauramos el valor original en eax
+    or eax, ebx                ; eax = eax OR ebx
+    ; Resultado de OR está ahora en eax
+
+    ; XOR: Realizamos la operación XOR a nivel de bits
+    mov eax, ecx               ; Restauramos el valor original en eax
+    xor eax, ebx               ; eax = eax XOR ebx
+    ; Resultado de XOR está ahora en eax
+
+    ; Salir del programa (Linux syscall para salir)
+    mov eax, 1                 ; syscall number for exit
+    xor ebx, ebx               ; return code 0
+    int 0x80                   ; interrupción del sistema para salir
