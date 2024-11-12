@@ -5,3 +5,32 @@
 % ===============================================
 
 % -------- Desplazamientos a la izquierda y derecha				------------
+
+.MODEL SMALL
+.STACK 100H
+.DATA
+    num DWORD 5    ; Número que vamos a desplazar
+    resultadoIzq DWORD ?
+    resultadoDer DWORD ?
+.CODE
+MAIN PROC
+    MOV AX, @DATA
+    MOV DS, AX
+
+    ; Desplazamiento a la izquierda (SHL)
+    MOV EAX, num         ; Cargar el valor de num en EAX
+    MOV CL, 1            ; Cantidad de posiciones a desplazar
+    SHL EAX, CL          ; Desplazamos EAX a la izquierda una vez
+    MOV resultadoIzq, EAX ; Guardar el resultado en resultadoIzq
+
+    ; Desplazamiento a la derecha (SHR)
+    MOV EAX, num         ; Cargar el valor de num en EAX nuevamente
+    MOV CL, 1            ; Cantidad de posiciones a desplazar
+    SHR EAX, CL          ; Desplazamos EAX a la derecha una vez
+    MOV resultadoDer, EAX ; Guardar el resultado en resultadoDer
+
+    ; Terminar el programa
+    MOV AX, 4C00H
+    INT 21H
+MAIN ENDP
+END MAIN
