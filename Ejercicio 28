@@ -5,3 +5,14 @@
 % ===============================================
 
 % -------- Establecer, borrar y alternar bits		------------
+
+; Entrada: 
+; - EAX contiene el valor al que queremos establecer el bit.
+; - ECX contiene la posición del bit que queremos establecer (0-31).
+; 
+; Resultado:
+; - EAX tiene el bit en la posición `ECX` establecido a 1.
+
+mov ebx, 1         ; Cargamos el valor 1 en EBX
+shl ebx, cl        ; Desplazamos 1 hacia la izquierda CL veces (CL contiene la posición)
+or eax, ebx        ; Aplicamos OR a EAX, estableciendo el bit en la posición CL
