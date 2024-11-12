@@ -5,3 +5,34 @@
 % ===============================================
 
 % -------- Contar los bits activados en un número	------------
+
+section .data
+    num dd 0xF0F0F0F0  ; Número de ejemplo, puedes cambiar este valor
+
+section .bss
+    count resd 1       ; Almacena el resultado de la cuenta de bits activados
+
+section .text
+    global _start
+
+_start:
+    ; Inicializamos los registros
+    mov ecx, 0         ; ecx servirá como contador de bits activados
+    mov eax, [num]     ; cargamos el número en eax para contarlo
+
+count_bits:
+    test eax, 1        ; Verifica si el bit menos significativo de eax está activado
+    jz skip_increment  ; Si es 0, salta la parte de incrementar
+    inc ecx            ; Si es 1, incrementa el contador de bits activados
+
+skip_increment:
+    shr eax, 1         ; Desplaza eax a la derecha, para verificar el siguiente bit
+    jnz count_bits     ; Repite el proceso mientras haya bits no nulos en eax
+
+    ; Guardamos el resultado
+    mov [count], ecx   ; Almacena el número de bits activados en 'count'
+
+    ; Salida del programa (solo para Linux)
+    mov eax, 1         ; syscall número 1 para la salida del programa
+    mov ebx, 0         ; código de salida 0
+    int 0x80           ; llama al kernel para
