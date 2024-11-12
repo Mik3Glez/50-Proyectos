@@ -7,42 +7,57 @@
 % -------- Transposición de una matriz		------------
 
 section .data
-    ; Declaramos las matrices y las inicializamos con valores.
-    matrizA db 1, 2   ; Fila 1: [1, 2]
-            db 3, 4   ; Fila 2: [3, 4]
-    
-    matrizB db 5, 6   ; Fila 1: [5, 6]
-            db 7, 8   ; Fila 2: [7, 8]
-    
-    resultado db 0, 0 ; Resultado inicializado en 0
-              db 0, 0 ; Fila 2 del resultado
+    n dd 3                                ; Dimensión de la matriz (3x3 en este caso)
+    matriz dd 1, 2, 3,                    ; Matriz original (almacenada en forma lineal)
+           4, 5, 6,
+           7, 8, 9
+
+section .bss
+    matrizT resd 9                        ; Matriz transpuesta (reserva espacio para n*n)
 
 section .text
     global _start
 
 _start:
-    ; Cargamos la dirección de las matrices en los registros para simplificar el acceso
-    mov esi, matrizA   ; ESI apunta a matrizA
-    mov edi, matrizB   ; EDI apunta a matrizB
-    mov edx, resultado ; EDX apunta al resultado
+    mov ecx, 0                            ; Índice del bucle externo (filas)
+    mov eax, [n]                          ; Cargar el tamaño de la matriz en eax
 
-    ; Sumar cada elemento de las matrices
-    mov al, [esi]      ; Cargar a11 de matrizA en AL
-    add al, [edi]      ; Sumar a11 + b11
-    mov [edx], al      ; Guardar en resultado[0][0]
+transposicion:
+    mov ebx, 0                            ; Índice del bucle interno (columnas)
 
-    mov al, [esi + 1]  ; Cargar a12 de matrizA en AL
-    add al, [edi + 1]  ; Sumar a12 + b12
-    mov [edx + 1], al  ; Guardar en resultado[0][1]
+    ; Para cada fila
+fila_loop:
+    ; Calcular la posición de matriz[i][j] = i * n + j
+    mov edx, ecx                          ; edx = i (fila)
+    mul edx                               ; eax = i * n
+    add eax, ebx                          ; eax = i * n + j
 
-    mov al, [esi + 2]  ; Cargar a21 de matrizA en AL
-    add al, [edi + 2]  ; Sumar a21 + b21
-    mov [edx + 2], al  ; Guardar en resultado[1][0]
+    ; Cargar matriz[i][j]
+    mov esi, eax                          ; Índice de matriz original
+    shl esi, 2                            ; Multiplicamos por 4 para obtener el byte offset
+    mov edi, [matriz + esi]               ; Cargar matriz[i][j] en edi
 
-    mov al, [esi + 3]  ; Cargar a22 de matrizA en AL
-    add al, [edi + 3]  ; Sumar a22 + b22
-    mov [edx + 3], al  ; Guardar en resultado[1][1]
+    ; Calcular la posición de matrizT[j][i] = j * n + i
+    mov eax, ebx                          ; eax = j (columna)
+    mul dword [n]                         ; eax = j * n
+    add eax, ecx                          ; eax = j * n + i
 
-    ; Terminar el programa
-    mov eax, 1         ; Syscall para salir en Linux
+    ; Guardar el valor en matrizT[j][i]
+    mov esi, eax                          ; Índice de matriz transpuesta
+    shl esi, 2                            ; Multiplicamos por 4 para obtener el byte offset
+    mov [matrizT + esi], edi              ; Guardar matriz[i][j] en matrizT[j][i]
+
+    ; Incrementar índice de columnas
+    inc ebx
+    cmp ebx, [n]                          ; Si j < n, repetir columna
+    jl fila_loop
+
+    ; Incrementar índice de filas
+    inc ecx
+    cmp ecx, [n]                          ; Si i < n, repetir fila
+    jl transposicion
+
+    ; Salir del programa (por simplicidad, no se muestra cómo imprimir la matriz transpuesta)
+    mov eax, 1                            ; syscall para salir
     int 0x80
+
