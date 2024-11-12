@@ -5,3 +5,134 @@
 % ===============================================
 
 % -------- Contar vocales y consonantes		------------
+
+section .data
+    mensaje db "Ingrese una cadena de texto: ", 0
+    vocales db "El numero de vocales es: ", 0
+    consonantes db "El numero de consonantes es: ", 0
+    buffer db 100 ; Espacio para leer la cadena de texto
+    len_buffer equ $ - buffer ; Tamaño del buffer
+
+section .bss
+    num_vocales resb 1
+    num_consonantes resb 1
+    longitud resb 1
+
+section .text
+    global _start
+
+_start:
+    ; Imprimir el mensaje de entrada
+    mov eax, 4          ; syscall write
+    mov ebx, 1          ; file descriptor: STDOUT
+    mov ecx, mensaje    ; mensaje
+    mov edx, 25         ; longitud del mensaje
+    int 0x80
+
+    ; Leer la entrada del usuario
+    mov eax, 3          ; syscall read
+    mov ebx, 0          ; file descriptor: STDIN
+    mov ecx, buffer     ; donde almacenar el texto
+    mov edx, len_buffer ; longitud máxima
+    int 0x80
+
+    ; Guardar longitud de la cadena
+    mov [longitud], al  ; el número de caracteres leídos se almacena en AL
+
+    ; Inicializar contadores a 0
+    mov byte [num_vocales], 0
+    mov byte [num_consonantes], 0
+
+    ; Recorrer cada carácter de la cadena
+    mov ecx, 0          ; índice de la cadena
+    .loop:
+        ; Comprobar fin de cadena
+        cmp ecx, [longitud]
+        je .fin_loop     ; Si llegamos al final, salir del loop
+
+        ; Obtener carácter actual
+        mov al, [buffer + ecx]
+
+        ; Comprobar si es vocal
+        cmp al, 'a'
+        je .es_vocal
+        cmp al, 'e'
+        je .es_vocal
+        cmp al, 'i'
+        je .es_vocal
+        cmp al, 'o'
+        je .es_vocal
+        cmp al, 'u'
+        je .es_vocal
+        cmp al, 'A'
+        je .es_vocal
+        cmp al, 'E'
+        je .es_vocal
+        cmp al, 'I'
+        je .es_vocal
+        cmp al, 'O'
+        je .es_vocal
+        cmp al, 'U'
+        je .es_vocal
+
+        ; Comprobar si es consonante (letras A-Z o a-z)
+        cmp al, 'a'
+        jl .no_consonante  ; Si es menor que 'a', no es letra
+        cmp al, 'z'
+        jle .es_consonante ; Si está entre 'a' y 'z', es consonante
+
+        cmp al, 'A'
+        jl .no_consonante
+        cmp al, 'Z'
+        jle .es_consonante
+
+        jmp .no_consonante ; Si no es letra, no se cuenta
+
+    .es_vocal:
+        ; Incrementar contador de vocales
+        inc byte [num_vocales]
+        jmp .siguiente
+
+    .es_consonante:
+        ; Incrementar contador de consonantes
+        inc byte [num_consonantes]
+        jmp .siguiente
+
+    .no_consonante:
+        ; No hacer nada, solo seguir al siguiente carácter
+
+    .siguiente:
+        inc ecx           ; avanzar al siguiente carácter
+        jmp .loop         ; repetir el ciclo
+
+    .fin_loop:
+        ; Imprimir número de vocales
+        mov eax, 4
+        mov ebx, 1
+        mov ecx, vocales
+        mov edx, 24
+        int 0x80
+
+        mov eax, 4
+        mov ebx, 1
+        mov ecx, num_vocales
+        mov edx, 1
+        int 0x80
+
+        ; Imprimir número de consonantes
+        mov eax, 4
+        mov ebx, 1
+        mov ecx, consonantes
+        mov edx, 29
+        int 0x80
+
+        mov eax, 4
+        mov ebx, 1
+        mov ecx, num_consonantes
+        mov edx, 1
+        int 0x80
+
+    ; Salir del programa
+    mov eax, 1          ; syscall exit
+    xor ebx, ebx        ; código de salida 0
+    int 0x80
