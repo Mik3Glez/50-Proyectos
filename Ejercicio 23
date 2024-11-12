@@ -5,3 +5,22 @@
 % ===============================================
 
 % -------- Conversión de entero a ASCII		------------
+
+section .data
+    buffer db '00000', 0    ; buffer de 5 bytes (para un número de hasta 5 dígitos)
+
+section .bss
+    length resb 1           ; almacenará la longitud del número en ASCII
+
+section .text
+    global _start
+
+_start:
+    ; Número a convertir (por ejemplo, 12345)
+    mov eax, 12345          ; almacena el número en EAX (número a convertir)
+    mov ecx, buffer + 4     ; apunta al final del buffer (en la posición de las unidades)
+    mov byte [length], 0    ; longitud inicial es 0
+
+convertir:
+    mov edx, 0              ; limpia el registro EDX para la división
+    mov ebx, 10             ; divisor (10, para separar dígitos)
