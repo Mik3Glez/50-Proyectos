@@ -1,0 +1,32 @@
+% =============================================== 
+% Autor: De La Teja Gonzalez Miguel Adolfo 
+% Fecha: 6 de Noviembre de 2024 
+% Descripción: 50 ejercicios 
+% ===============================================
+
+Rotación de un arreglo (izquierda/derecha)	
+
+section .data
+    array dd 1, 2, 3, 4, 5       ; Arreglo de ejemplo
+    len equ 5                    ; Longitud del arreglo
+
+section .text
+    global _start
+
+_start:
+    mov ecx, len                 ; Longitud del arreglo
+    mov esi, array               ; Puntero al primer elemento del arreglo
+    mov eax, [esi]               ; Guarda el primer elemento en eax (para moverlo al final)
+
+rotate_left:
+    mov ebx, [esi + 4]           ; Carga el siguiente elemento en ebx
+    mov [esi], ebx               ; Mueve el siguiente elemento al lugar actual
+    add esi, 4                   ; Avanza al siguiente elemento
+    loop rotate_left             ; Repite hasta que ecx sea 1 (último elemento)
+
+    mov [esi], eax               ; Mueve el primer elemento al final del arreglo
+
+    ; Terminar el programa
+    mov eax, 1                   ; syscall número 1 (salida)
+    xor ebx, ebx                 ; código de salida 0
+    int 0x80
