@@ -1,0 +1,83 @@
+========================================== 
+% Autor: De La Teja Gonzalez Miguel Adolfo 
+% Fecha: 6 de Noviembre de 2024 
+% Descripción: 50 ejercicios 
+% ===============================================
+
+Implementar una cola usando un arreglo	
+
+section .data
+    capacidad db 5                ; Capacidad de la cola
+    cola db 5 dup(0)              ; Arreglo de 5 elementos, inicializados a 0
+    front db 0                    ; Puntero al frente de la cola
+    rear db 0                     ; Puntero al final de la cola
+    mensaje db "Elemento insertado", 0  ; Mensaje para confirmar inserción
+
+section .text
+    global _start
+
+_start:
+    ; Ejemplo: Insertamos elementos en la cola
+    ; Inserta el número 10 en la cola
+    mov al, 10
+    call insertar
+
+    ; Inserta el número 20 en la cola
+    mov al, 20
+    call insertar
+
+    ; Inserta el número 30 en la cola
+    mov al, 30
+    call insertar
+
+    ; Ejemplo: Eliminar un elemento de la cola
+    call eliminar
+
+    ; Salida del programa (solo para Linux)
+    mov eax, 1         ; syscall número 1 para la salida del programa
+    mov ebx, 0         ; código de salida 0
+    int 0x80           ; llama al kernel para salir
+
+; Función insertar: Inserta un elemento en la cola
+insertar:
+    ; Comprobamos si la cola está llena
+    mov al, [rear]     ; Cargamos el valor de rear
+    mov bl, [capacidad] ; Cargamos la capacidad
+    cmp al, bl         ; Comparamos si rear == capacidad
+    je  cola_llena     ; Si es igual, la cola está llena
+
+    ; Insertar el elemento en la cola
+    mov [cola + ebx], al   ; Coloca el valor de AL en el arreglo cola[rear]
+    inc byte [rear]         ; Incrementa rear
+
+    ; Mensaje de éxito
+    mov eax, 4              ; syscall número 4 (write)
+    mov ebx, 1              ; file descriptor (stdout)
+    mov ecx, mensaje        ; mensaje a imprimir
+    mov edx, 20             ; longitud del mensaje
+    int 0x80                ; llamada al kernel para imprimir mensaje
+
+    ret
+
+cola_llena:
+    ; Si la cola está llena, podemos agregar alguna lógica de manejo de error
+    ; Salimos sin hacer nada
+    ret
+
+; Función eliminar: Elimina el elemento del frente de la cola
+eliminar:
+    ; Comprobamos si la cola está vacía
+    mov al, [front]        ; Cargamos el valor de front
+    cmp al, [rear]         ; Si front == rear, la cola está vacía
+    je  cola_vacia         ; Si está vacía, salimos
+
+    ; Eliminar el primer elemento de la cola (front)
+    mov al, [cola + front] ; Cargamos el valor de cola[front]
+    ; Aquí podrías agregar el valor eliminado a algún lugar o procesarlo
+    inc byte [front]       ; Incrementa el puntero de front para eliminar el elemento
+
+    ret
+
+cola_vacia:
+    ; Si la cola está vacía, podemos agregar alguna lógica de manejo de error
+    ret
