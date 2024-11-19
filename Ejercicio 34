@@ -1,0 +1,34 @@
+% =============================================== 
+% Autor: De La Teja Gonzalez Miguel Adolfo 
+% Fecha: 6 de Noviembre de 2024 
+% Descripción: 50 ejercicios 
+% ===============================================
+
+Invertir los elementos de un arreglo	
+
+section .data
+    array dd 1, 2, 3, 4, 5         ; Arreglo de ejemplo con 5 elementos
+    len   equ 5                    ; Longitud del arreglo
+
+section .bss
+
+section .text
+    global _start
+
+_start:
+    mov esi, array                 ; Apunta al inicio del arreglo (puntero al primer elemento)
+    mov edi, array + (len - 1) * 4 ; Apunta al final del arreglo (puntero al último elemento)
+    mov ecx, len                   ; Cantidad de elementos en el arreglo
+
+reverse_loop:
+    cmp esi, edi                   ; Verifica si los punteros se cruzaron o son iguales
+    jge done                       ; Si ya se cruzaron o son iguales, termina el bucle
+
+    ; Intercambiar los valores en [esi] y [edi]
+    mov eax, [esi]                 ; Carga el valor del inicio del arreglo en eax
+    mov ebx, [edi]                 ; Carga el valor del final del arreglo en ebx
+    mov [esi], ebx                 ; Guarda el valor del final en la posición inicial
+    mov [edi], eax                 ; Guarda el valor del inicio en la posición final
+
+    ; Avanzar los punteros
+    add esi, 4                     ; Avanza al siguiente elemento desde el
