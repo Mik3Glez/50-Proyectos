@@ -1,0 +1,46 @@
+========================================== 
+% Autor: De La Teja Gonzalez Miguel Adolfo 
+% Fecha: 6 de Noviembre de 2024 
+% Descripción: 50 ejercicios 
+% ===============================================
+
+Convertir decimal a binario	
+
+section .data
+    num dd 29             ; Número decimal a convertir
+    binary db 33 dup(0)   ; Espacio para almacenar la cadena binaria (máximo 32 bits + terminador)
+
+section .text
+    global _start
+
+_start:
+    ; Inicializamos los registros
+    mov eax, [num]        ; Cargamos el número decimal en eax
+    mov ebx, binary       ; Apuntamos a la cadena binaria
+    mov ecx, 32           ; Establecemos 32 bits como el tamaño máximo
+
+convert_to_binary:
+    ; Realizamos la división entre 2
+    xor edx, edx          ; Limpiamos edx para asegurarnos de que no tenga datos
+    div byte 2            ; Dividimos eax entre 2, el resto está en al (eax % 2)
+    
+    ; Almacenamos el resto en la cadena binaria
+    add dl, '0'           ; Convertimos el valor de 0 o 1 en el carácter ASCII
+    mov [ebx + ecx - 1], dl  ; Guardamos el carácter en la posición correspondiente
+
+    ; Reducimos ecx y repetimos
+    dec ecx
+    test eax, eax          ; Verificamos si eax es 0
+    jnz convert_to_binary  ; Si no es 0, continuamos
+
+    ; Imprimimos la cadena binaria
+    mov edx, 32            ; Tamaño de la cadena binaria (32 bits)
+    mov ecx, binary        ; Dirección de la cadena binaria
+    mov ebx, 1             ; STDOUT
+    mov eax, 4             ; sys_write
+    int 0x80               ; Llamada al sistema para imprimir
+
+    ; Salir del programa
+    mov eax, 1             ; syscall número 1 para salir
+    xor ebx, ebx           ; Código de salida 0
+    int 0x80               ; Llamada al sistema para salir
