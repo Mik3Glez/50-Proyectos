@@ -1,0 +1,57 @@
+========================================== 
+% Autor: De La Teja Gonzalez Miguel Adolfo 
+% Fecha: 6 de Noviembre de 2024 
+% Descripción: 50 ejercicios 
+% ===============================================
+
+Verificar si un número es Armstrong	
+
+section .data
+    num dd 153         ; Número a verificar (puedes cambiarlo)
+    result db 0        ; Resultado de la verificación (0 para no Armstrong, 1 para Armstrong)
+
+section .text
+    global _start
+
+_start:
+    ; Cargar el número en eax
+    mov eax, [num]     ; Cargamos el número en eax
+
+    ; Paso 1: Calcular la cantidad de dígitos (suponiendo que es un número de 3 dígitos)
+    mov ecx, 10        ; Divisor 10 para obtener los dígitos
+    xor edx, edx       ; Limpiamos edx (requerido para la división)
+    div ecx            ; eax / 10, eax = cociente, edx = resto (último dígito)
+    mov ebx, eax       ; ebx tiene el número sin el último dígito
+    mov eax, [num]     ; Volvemos a cargar el número original en eax
+    xor ecx, ecx       ; Inicializamos el contador de dígitos en ecx
+
+count_digits:
+    div ecx            ; Dividimos eax entre 10
+    inc ecx            ; Incrementamos el contador de dígitos
+    test eax, eax      ; Comprobamos si hemos llegado a 0
+    jnz count_digits   ; Si no, seguimos contando
+
+    ; Paso 2: Sumar los dígitos elevados a la potencia de la cantidad de dígitos
+    mov eax, [num]     ; Volvemos a cargar el número original en eax
+    mov edx, 0         ; Limpiamos edx (usado para la suma de los dígitos elevados)
+
+sum_digits:
+    ; Extraemos el último dígito de eax
+    mov ebx, eax
+    and ebx, 0x0F      ; Extraemos el último dígito (en el rango 0-9)
+    ; Elevar el dígito al cubo (o a la potencia del número de dígitos)
+    ; Aquí usaremos una potencia de 3 como ejemplo para números de 3 dígitos.
+    ; Para elevar a cualquier número de dígitos, se hace una pequeña variación en el código.
+
+    ; Elevar al cubo
+    mov ecx, ebx       ; Mover el dígito a ecx
+    imul ecx, ecx      ; ecx = ebx^2
+    imul ecx, ebx      ; ecx = ebx^3
+
+    ; Sumar al total
+    add edx, ecx       ; Sumamos el valor elevado al total en edx
+
+    ; Dividir el número original para obtener el siguiente dígito
+    mov eax, ebx
+    div ecx            ; Divide el número por 10 para sacar el siguiente dígito
+
