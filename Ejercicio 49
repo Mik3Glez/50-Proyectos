@@ -1,0 +1,43 @@
+========================================== 
+% Autor: De La Teja Gonzalez Miguel Adolfo 
+% Fecha: 6 de Noviembre de 2024 
+% Descripción: 50 ejercicios 
+% ===============================================
+
+Leer entrada desde el teclado	
+
+section .bss
+    buffer resb 128       ; Reservamos 128 bytes para almacenar la entrada
+
+section .text
+    global _start
+
+_start:
+    ; Imprimir mensaje de solicitud de entrada
+    mov eax, 4            ; syscall número 4 (sys_write)
+    mov ebx, 1            ; file descriptor 1 (stdout)
+    mov ecx, message      ; dirección del mensaje
+    mov edx, message_len  ; longitud del mensaje
+    int 0x80              ; llamada al sistema
+
+    ; Leer la entrada desde el teclado
+    mov eax, 3            ; syscall número 3 (sys_read)
+    mov ebx, 0            ; file descriptor 0 (stdin)
+    mov ecx, buffer       ; dirección del buffer donde se guardará la entrada
+    mov edx, 128          ; leer hasta 128 bytes
+    int 0x80              ; llamada al sistema
+
+    ; Imprimir lo que se ha leído (opcional)
+    mov eax, 4            ; syscall número 4 (sys_write)
+    mov ebx, 1            ; file descriptor 1 (stdout)
+    mov edx, 128          ; Longitud máxima de los caracteres a imprimir
+    int 0x80              ; llamada al sistema
+
+    ; Salir del programa
+    mov eax, 1            ; syscall número 1 (sys_exit)
+    xor ebx, ebx          ; código de salida 0
+    int 0x80              ; llamada al sistema
+
+section .data
+message db 'Ingrese un texto: ', 0   ; Mensaje a imprimir
+message_len equ $ - message           ; Longitud del mensaje
