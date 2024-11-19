@@ -1,0 +1,50 @@
+========================================== 
+% Autor: De La Teja Gonzalez Miguel Adolfo 
+% Fecha: 6 de Noviembre de 2024 
+% Descripción: 50 ejercicios 
+% ===============================================
+
+Conversión de decimal a hexadecimal	
+
+section .data
+    num dd 12345678h    ; Número en formato hexadecimal (ejemplo)
+    hex_digits db "0123456789ABCDEF"  ; Tabla de dígitos hexadecimales
+
+section .bss
+    result resb 8       ; Espacio para guardar la representación hexadecimal
+
+section .text
+    global _start
+
+_start:
+    ; Inicializamos los registros
+    mov eax, [num]      ; Cargamos el número a convertir en eax
+    mov ebx, 16         ; Base hexadecimal (16)
+    lea edi, [result]   ; Dirección donde guardaremos la cadena hexadecimal
+    add edi, 7          ; Movemos edi a la última posición para escribir desde atrás (espacio para 8 caracteres)
+
+    ; Inicializamos el espacio de resultado a 0
+    mov byte [edi + 1], 0
+    mov byte [edi], 0   ; Fin de cadena al final
+
+convert:
+    dec edi             ; Mover el puntero hacia atrás
+    xor edx, edx        ; Limpiar edx (residuo de la división)
+    div byte [hex_digits + ebx] ; División de eax entre 16, edx tendrá el residuo
+    mov al, dl          ; Tomamos el residuo (dígito hexadecimal)
+    mov [edi], al       ; Guardamos el dígito en la cadena
+
+    test eax, eax       ; Si eax es 0, hemos terminado
+    jnz convert         ; Si no, seguimos con la siguiente división
+
+    ; Mostrar el resultado (salida del programa en Linux)
+    mov eax, 4          ; syscall número 4 (escribir)
+    mov ebx, 1          ; salida estándar (stdout)
+    lea ecx, [result]   ; dirección del buffer de salida
+    mov edx, 8          ; longitud de la cadena (8 dígitos hexadecimales)
+    int 0x80            ; llamada al sistema para escribir en consola
+
+    ; Finalizamos el programa
+    mov eax, 1          ; syscall número 1 (salir)
+    xor ebx, ebx        ; código de salida 0
+    int 0x80            ; llamada al sistema para salir
