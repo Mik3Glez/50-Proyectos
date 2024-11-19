@@ -1,0 +1,36 @@
+========================================== 
+% Autor: De La Teja Gonzalez Miguel Adolfo 
+% Fecha: 6 de Noviembre de 2024 
+% Descripción: 50 ejercicios 
+% ===============================================
+
+Convertir binario a decimal	
+
+section .data
+    bin_number dd 10101010101010101010101010101010b  ; Número binario de ejemplo (en binario)
+    result db "Resultado en decimal: ", 0  ; Mensaje de salida
+    num db 10, 0  ; espacio para el número convertido a string
+
+section .bss
+    decimal resd 1  ; Almacenar el resultado decimal
+
+section .text
+    global _start
+
+_start:
+    ; Cargar el número binario en eax
+    mov eax, [bin_number]  ; Cargar el número binario
+
+    ; Inicializar el contador de posición (posición en el número binario)
+    mov ecx, 0             ; ecx será usado como el contador de bits procesados
+    mov ebx, 1             ; ebx servirá como la base para el valor decimal (empezamos con 1)
+
+    ; Bucle para recorrer el número binario bit por bit
+convert_loop:
+    test eax, 1            ; Verificar el bit menos significativo
+    jz next_bit            ; Si el bit es 0, saltamos
+    add [decimal], ebx     ; Si el bit es 1, sumar la base (el valor decimal correspondiente)
+next_bit:
+    shr eax, 1             ; Desplazar a la derecha para procesar el siguiente bit
+    shl ebx, 1             ; Multiplicar la base por 2 (mover a la siguiente potencia de 2)
+    inc ecx           
