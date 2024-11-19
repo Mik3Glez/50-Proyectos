@@ -1,0 +1,53 @@
+========================================== 
+% Autor: De La Teja Gonzalez Miguel Adolfo 
+% Fecha: 6 de Noviembre de 2024 
+% Descripción: 50 ejercicios 
+% ===============================================
+
+Escribir en un archivo	
+
+section .data
+    filename db 'output.txt', 0      ; Nombre del archivo (terminado en 0 para indicar fin de cadena)
+    message db 'Hola, mundo!', 0      ; Mensaje a escribir en el archivo
+    message_len equ $ - message       ; Longitud del mensaje
+
+section .text
+    global _start
+
+_start:
+    ; Abrir o crear el archivo (syscall 5)
+    ; int open(const char *pathname, int flags, mode_t mode);
+    ; Parámetros: 
+    ;   1) La dirección de 'filename'
+    ;   2) O_RDONLY = 0, O_WRONLY = 1, O_RDWR = 2, O_CREAT = 64
+    ;   3) Permiso 0644 (rw-r--r--, solo lectura para otros)
+    mov eax, 5          ; syscall number para open
+    mov ebx, filename   ; dirección del nombre del archivo
+    mov ecx, 577        ; flags O_WRONLY | O_CREAT | O_TRUNC (crea el archivo, lo trunca si existe)
+    mov edx, 0644       ; permisos del archivo (rw-r--r--)
+    int 0x80            ; llamada al sistema
+
+    ; Comprobar si la llamada a 'open' fue exitosa
+    ; Si eax es negativo, hubo un error
+    js .exit             ; Si hubo error, termina el programa
+
+    ; Guardar el descriptor de archivo
+    mov ebx, eax        ; El descriptor de archivo se encuentra en eax después de open
+
+    ; Escribir el mensaje en el archivo (syscall 4)
+    ; int write(int fd, const void *buf, size_t count);
+    mov eax, 4          ; syscall number para write
+    mov ecx, message    ; dirección del mensaje
+    mov edx, message_len; longitud del mensaje
+    int 0x80            ; llamada al sistema
+
+    ; Cerrar el archivo (syscall 6)
+    ; int close(int fd);
+    mov eax, 6          ; syscall number para close
+    int 0x80            ; llamada al sistema
+
+.exit:
+    ; Salir del programa (syscall 1)
+    mov eax, 1          ; syscall number para exit
+    xor ebx, ebx        ; código de salida 0
+    int 0x80            ; llamada al sistema
