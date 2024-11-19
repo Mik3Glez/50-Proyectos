@@ -1,0 +1,49 @@
+========================================== 
+% Autor: De La Teja Gonzalez Miguel Adolfo 
+% Fecha: 6 de Noviembre de 2024 
+% Descripción: 50 ejercicios 
+% ===============================================
+
+Conversión de hexadecimal a decimal	
+
+section .data
+    hex_string db '1A3F', 0    ; Número hexadecimal en formato cadena (terminado en 0)
+    result db 0                ; Variable para almacenar el resultado (decimal)
+
+section .text
+    global _start
+
+_start:
+    ; Inicializamos los registros
+    mov esi, hex_string       ; Cargar la dirección de la cadena hexadecimal en ESI
+    xor eax, eax              ; Limpiar EAX, que será nuestro resultado decimal
+    xor ebx, ebx              ; Limpiar EBX, que se usará para almacenar el valor actual del dígito
+
+convert_loop:
+    ; Cargar el siguiente carácter de la cadena hexadecimal
+    mov al, byte [esi]
+    inc esi                   ; Mover al siguiente carácter en la cadena
+    cmp al, 0                 ; Comprobar si es el final de la cadena (carácter nulo)
+    je end_conversion         ; Si es el final, terminar el ciclo
+
+    ; Convertir el carácter hexadecimal a su valor decimal
+    sub al, '0'               ; Restar '0' para obtener valores de 0 a 9
+    cmp al, 9                 ; Si el valor es mayor que 9, es una letra (A-F)
+    jle store_digit           ; Si es un número, continuar
+    sub al, 7                 ; Restar 7 para convertir 'A'-'F' a valores 10-15
+
+store_digit:
+    ; Multiplicar el resultado por 16 (desplazar a la izquierda 4 bits)
+    shl eax, 4                ; EAX = EAX * 16
+    add eax, ebx              ; EAX = EAX + valor del dígito
+
+    jmp convert_loop          ; Continuar con el siguiente dígito
+
+end_conversion:
+    ; Almacenar el resultado decimal en 'result'
+    mov [result], eax         ; Guardar el resultado final en 'result'
+
+    ; Para terminar el programa (solo para Linux)
+    mov eax, 1                ; syscall número 1 (salida)
+    xor ebx, ebx              ; código de salida 0
+    int 0x80                  ; llamada al sistema para salir
