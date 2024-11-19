@@ -1,0 +1,55 @@
+========================================== 
+% Autor: De La Teja Gonzalez Miguel Adolfo 
+% Fecha: 6 de Noviembre de 2024 
+% Descripción: 50 ejercicios 
+% ===============================================
+
+Medir el tiempo de ejecución de una función	
+
+section .data
+    msg db "Tiempo de ejecucion: ", 0    ; Mensaje para mostrar el tiempo de ejecución
+    fmt db "%ld", 0                       ; Formato para la impresión de tiempo
+
+section .bss
+    start_time resq 1    ; Almacenar el tiempo inicial
+    end_time resq 1      ; Almacenar el tiempo final
+
+section .text
+    global _start
+    extern printf
+
+_start:
+    ; Obtener el tiempo antes de ejecutar la función
+    rdtsc                          ; Lee el contador de tiempo de la CPU (RDTSC)
+    mov [start_time], eax          ; Guarda el tiempo inicial (EAX contiene el valor del ciclo)
+    
+    ; Llamar a la función cuya duración quieres medir
+    call my_function               ; Aquí se llama a la función cuyo tiempo se mide
+
+    ; Obtener el tiempo después de ejecutar la función
+    rdtsc                          ; Lee el contador de tiempo de la CPU (RDTSC)
+    mov [end_time], eax            ; Guarda el tiempo final
+
+    ; Calcular la diferencia entre los tiempos
+    mov eax, [end_time]            ; Cargar el tiempo final
+    sub eax, [start_time]          ; Resta el tiempo inicial
+    mov ebx, eax                   ; Guardar la diferencia en ebx (duración en ciclos de CPU)
+
+    ; Mostrar el resultado en la consola (Tiempo de ejecución)
+    push ebx
+    push msg
+    call printf                    ; Llamada a printf para mostrar el tiempo
+
+    ; Salir del programa
+    mov eax, 1                     ; Syscall número 1 (exit)
+    xor ebx, ebx                   ; Código de salida 0
+    int 0x80
+
+my_function:
+    ; Aquí va el código de la función cuya duración deseas medir
+    ; Simulamos una función con un bucle para retrasar un poco
+    mov ecx, 100000000
+function_loop:
+    dec ecx
+    jnz function_loop
+    ret
