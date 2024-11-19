@@ -5,3 +5,33 @@
 % ===============================================
 
 % -------- Máximo Común Divisor (MCD)		------------
+
+section .data
+    num1 dd 48         ; Primer número
+    num2 dd 18         ; Segundo número
+    result dd 0        ; Para almacenar el resultado (MCD)
+
+section .text
+    global _start
+
+_start:
+    ; Cargar los números en registros
+    mov eax, [num1]    ; Carga el primer número en eax
+    mov ebx, [num2]    ; Carga el segundo número en ebx
+
+mcd_loop:
+    cmp ebx, 0         ; Compara ebx con 0
+    je end_mcd         ; Si ebx es 0, hemos terminado (MCD está en eax)
+    xor edx, edx       ; Limpia el registro edx antes de la división
+    div ebx            ; Divide eax entre ebx, el resto queda en edx
+    mov eax, ebx       ; Mueve el divisor actual (ebx) al dividendo (eax)
+    mov ebx, edx       ; Mueve el resto al divisor (ebx)
+    jmp mcd_loop       ; Repite el ciclo
+
+end_mcd:
+    mov [result], eax  ; Almacena el resultado (MCD) en la variable 'result'
+
+    ; Salida del programa (solo para Linux)
+    mov eax, 1         ; syscall número 1 para la salida del programa
+    mov ebx, 0         ; código de salida 0
+    int 0x80           ; llama al kernel para salir
