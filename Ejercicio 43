@@ -1,0 +1,128 @@
+========================================== 
+% Autor: De La Teja Gonzalez Miguel Adolfo 
+% Fecha: 6 de Noviembre de 2024 
+% Descripción: 50 ejercicios 
+% ===============================================
+
+Calculadora simple (Suma, Resta, Multiplicación, División)	
+
+section .data
+    prompt db "Selecciona una operacion: 1. Suma, 2. Resta, 3. Multiplicacion, 4. Division: ", 0
+    prompt_num db "Ingresa un numero: ", 0
+    msg_result db "El resultado es: ", 0
+    newline db 0xA, 0  ; Salto de línea
+
+section .bss
+    num1 resb 4         ; Almacena el primer número
+    num2 resb 4         ; Almacena el segundo número
+    operation resb 1    ; Almacena la operación seleccionada
+
+section .text
+    global _start
+
+_start:
+    ; Mostrar mensaje para seleccionar operación
+    mov eax, 4          ; syscall para escribir
+    mov ebx, 1          ; archivo de salida estándar
+    mov ecx, prompt     ; mensaje
+    mov edx, 64         ; longitud del mensaje
+    int 0x80            ; llamada al sistema
+
+    ; Leer la operación seleccionada
+    mov eax, 3          ; syscall para leer
+    mov ebx, 0          ; desde la entrada estándar (teclado)
+    mov ecx, operation  ; almacenar la operación en 'operation'
+    mov edx, 1          ; leer 1 byte
+    int 0x80            ; llamada al sistema
+
+    ; Mostrar mensaje para ingresar el primer número
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, prompt_num
+    mov edx, 19
+    int 0x80
+
+    ; Leer el primer número
+    mov eax, 3
+    mov ebx, 0
+    mov ecx, num1
+    mov edx, 4
+    int 0x80
+
+    ; Mostrar mensaje para ingresar el segundo número
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, prompt_num
+    mov edx, 19
+    int 0x80
+
+    ; Leer el segundo número
+    mov eax, 3
+    mov ebx, 0
+    mov ecx, num2
+    mov edx, 4
+    int 0x80
+
+    ; Convertir los números leídos de ASCII a enteros (esto es un proceso simple)
+    ; Aquí vamos a asumir que los números son de un solo dígito para simplificar
+    mov al, [num1]      ; Cargar el primer número
+    sub al, '0'         ; Convertir de ASCII a entero
+    mov bl, al          ; Guardar en bl
+
+    mov al, [num2]      ; Cargar el segundo número
+    sub al, '0'         ; Convertir de ASCII a entero
+    mov cl, al          ; Guardar en cl
+
+    ; Operación según la opción seleccionada (almacenada en 'operation')
+    mov al, [operation] ; Cargar la operación seleccionada
+    cmp al, '1'         ; Comparar con '1' (Suma)
+    je suma
+    cmp al, '2'         ; Comparar con '2' (Resta)
+    je resta
+    cmp al, '3'         ; Comparar con '3' (Multiplicación)
+    je multiplicacion
+    cmp al, '4'         ; Comparar con '4' (División)
+    je division
+    jmp fin             ; Si no coincide, finalizar
+
+suma:
+    ; Realizar la suma
+    mov al, bl
+    add al, cl
+    jmp mostrar_resultado
+
+resta:
+    ; Realizar la resta
+    mov al, bl
+    sub al, cl
+    jmp mostrar_resultado
+
+multiplicacion:
+    ; Realizar la multiplicación
+    mov al, bl
+    imul al, cl
+    jmp mostrar_resultado
+
+division:
+    ; Realizar la división
+    mov al, bl
+    xor ah, ah         ; Limpiar el registro ah para una división de 8 bits
+    div cl             ; División entre 'cl' (resultado en al)
+    jmp mostrar_resultado
+
+mostrar_resultado:
+    ; Mostrar el resultado
+    mov eax, 4          ; syscall para escribir
+    mov ebx, 1          ; salida estándar
+    mov ecx, msg_result ; mensaje "El resultado es:"
+    mov edx, 16         ; longitud del mensaje
+    int 0x80            ; llamada al sistema
+
+    ; Convertir el resultado a ASCII
+    add al, '0'         ; Convertir el resultado a ASCII
+    mov [num1], al      ; Almacenar el resultado como un carácter
+
+    ; Imprimir el resultado
+    mov eax, 4
+    mov ebx, 1
+    mov ecx, num1       ; Resultado
