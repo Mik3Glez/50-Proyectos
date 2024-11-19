@@ -1,2 +1,78 @@
-%
-%
+========================================== 
+% Autor: De La Teja Gonzalez Miguel Adolfo 
+% Fecha: 6 de Noviembre de 2024 
+% Descripción: 50 ejercicios 
+% ===============================================
+
+Implementar una pila usando un arreglo	
+
+section .data
+    stack_size equ 10       ; Definir el tamaño de la pila
+    stack db stack_size dup(0) ; Crear el arreglo de la pila (inicializado a 0)
+    top db 0                ; Inicializamos el índice de la pila (top)
+
+section .bss
+    value resb 1            ; Variable para almacenar el valor a apilar/desapilar
+
+section .text
+    global _start
+
+_start:
+    ; Ejemplo de operaciones: Push y Pop
+
+    ; Pushear un valor en la pila
+    mov al, 5               ; Cargar el valor 5 en el registro AL (por ejemplo)
+    call push               ; Llamar a la función push
+
+    ; Pushear otro valor en la pila
+    mov al, 10              ; Cargar el valor 10 en AL
+    call push               ; Llamar a la función push
+
+    ; Desapilar el valor superior de la pila
+    call pop                ; Llamar a la función pop
+
+    ; Terminar el programa
+    mov eax, 1              ; Syscall número 1: salida del programa
+    xor ebx, ebx            ; Código de salida 0
+    int 0x80                ; Llamada al sistema para terminar
+
+; Función Push (apilar un valor)
+push:
+    ; Verificar si la pila está llena
+    mov al, [top]           ; Cargar el valor de la cima de la pila en AL
+    cmp al, stack_size      ; Comparar el índice con el tamaño máximo de la pila
+    jge stack_full          ; Si es mayor o igual, la pila está llena
+
+    ; Si la pila no está llena, apilamos el valor
+    mov al, [value]         ; Cargar el valor a apilar en AL
+    mov bl, [top]           ; Cargar el índice de la pila
+    mov [stack + ebx], al   ; Guardamos el valor en el arreglo de la pila
+
+    ; Incrementar el índice de la pila
+    inc byte [top]          ; Incrementamos el índice de la pila
+    ret
+
+stack_full:
+    ; Si la pila está llena, podemos hacer algo (imprimir mensaje, retornar, etc.)
+    ret
+
+; Función Pop (desapilar un valor)
+pop:
+    ; Verificar si la pila está vacía
+    mov al, [top]           ; Cargar el índice de la pila
+    cmp al, 0               ; Comparar con 0 (pila vacía)
+    je stack_empty          ; Si es 0, la pila está vacía
+
+    ; Si la pila no está vacía, desapilamos el valor
+    dec byte [top]          ; Decrementar el índice de la pila
+    mov bl, [top]           ; Cargar el índice de la cima de la pila
+    mov al, [stack + ebx]   ; Obtener el valor desapilado
+
+    ; (Almacenamos o usamos el valor de AL como se desee)
+    ; Aquí solo guardamos el valor en la variable 'value'
+    mov [value], al         ; Guardar el valor desapilado en 'value'
+    ret
+
+stack_empty:
+    ; Si la pila está vacía, podemos hacer algo (imprimir mensaje, retornar, etc.)
+    ret
