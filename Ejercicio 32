@@ -1,0 +1,38 @@
+% =============================================== 
+% Autor: De La Teja Gonzalez Miguel Adolfo 
+% Fecha: 6 de Noviembre de 2024 
+% Descripción: 50 ejercicios 
+% ===============================================
+
+Potencia (x^n)	
+
+section .data
+    base dd 3           ; Base (x), puedes cambiar el valor
+    exponent dd 4       ; Exponente (n), puedes cambiar el valor
+    result dd 1         ; Inicializamos el resultado en 1 (x^0 = 1)
+
+section .text
+    global _start
+
+_start:
+    ; Cargamos los valores iniciales
+    mov eax, [base]     ; Cargar la base en eax
+    mov ebx, [exponent] ; Cargar el exponente en ebx
+    mov ecx, 1          ; Inicializar resultado en ecx con 1
+
+    ; Comprobar si el exponente es 0
+    cmp ebx, 0          ; Si el exponente es 0, salta al final
+    je end_power        ; x^0 = 1 por definición
+
+power_loop:
+    imul ecx, eax       ; Multiplica ecx (resultado) por eax (base)
+    dec ebx             ; Decrementa el exponente
+    jnz power_loop      ; Si ebx no es 0, repetir el bucle
+
+end_power:
+    mov [result], ecx   ; Guardar el resultado en la variable 'result'
+
+    ; Salida del programa (solo para Linux)
+    mov eax, 1          ; syscall número 1 para salida del programa
+    mov ebx, 0          ; código de salida 0
+    int 0x80            ; llama al kernel para salir
