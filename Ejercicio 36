@@ -1,0 +1,43 @@
+% =============================================== 
+% Autor: De La Teja Gonzalez Miguel Adolfo 
+% Fecha: 6 de Noviembre de 2024 
+% Descripción: 50 ejercicios 
+% ===============================================
+
+Encontrar el segundo elemento más grande	
+
+section .data
+    numbers dd 12, 45, 7, 89, 56, 23, 67, 89, 34 ; Array de números
+    n dd 9                                       ; Tamaño del array
+    first dd 0                                   ; Mayor elemento
+    second dd 0                                  ; Segundo mayor elemento
+
+section .text
+    global _start
+
+_start:
+    ; Inicializamos registros
+    mov ecx, [n]        ; Cargar tamaño del array en ecx
+    mov esi, numbers    ; Puntero al inicio del array
+    mov eax, 0          ; first = 0
+    mov edx, 0          ; second = 0
+
+find_max:
+    mov ebx, [esi]      ; Cargar el siguiente número del array
+    cmp ebx, eax        ; Comparar con el mayor actual (first)
+    jle check_second    ; Si no es mayor que first, verificar segundo mayor
+    mov edx, eax        ; Actualizar second = first
+    mov eax, ebx        ; Actualizar first = current
+
+check_second:
+    cmp ebx, edx        ; Comparar con el segundo mayor (second)
+    jle skip            ; Si no es mayor, saltar
+    cmp ebx, eax        ; Asegurarse de que no es igual a first
+    je skip             ; Si es igual a first, ignorarlo
+    mov edx, ebx        ; Actualizar second = current
+
+skip:
+    add esi, 4          ; Avanzar al siguiente número del array
+    loop find_max       ; Repetir hasta que ecx llegue a 0
+
+    ; Guardar resultados
