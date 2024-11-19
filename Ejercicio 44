@@ -1,0 +1,42 @@
+========================================== 
+% Autor: De La Teja Gonzalez Miguel Adolfo 
+% Fecha: 6 de Noviembre de 2024 
+% Descripción: 50 ejercicios 
+% ===============================================
+
+Generación de números aleatorios (con semilla)	
+
+section .data
+    ; Constantes para el generador pseudoaleatorio
+    A dd 1664525        ; Constante multiplicativa (puede ser cambiada)
+    C dd 1013904223     ; Constante aditiva (puede ser 0 o cualquier otro valor)
+    M dd 0xFFFFFFFF     ; Módulo (puede ser 2^32, 2^64, etc.)
+
+    ; Semilla inicial
+    seed dd 12345       ; Semilla de ejemplo
+
+section .bss
+    random_number resd 1  ; Variable donde se almacenará el número aleatorio generado
+
+section .text
+    global _start
+
+_start:
+    ; Cargar la semilla inicial
+    mov eax, [seed]       ; Cargamos la semilla en eax
+    mov ebx, [A]          ; Cargamos la constante A
+    mov ecx, [C]          ; Cargamos la constante C
+    mov edx, [M]          ; Cargamos el módulo M
+
+    ; Algoritmo del generador de números aleatorios
+generate_random:
+    imul eax, ebx         ; eax = eax * A
+    add eax, ecx          ; eax = eax + C
+    mov ebx, eax          ; Guardamos el nuevo valor de eax en ebx para la siguiente iteración
+    and eax, edx          ; eax = eax & M (aplicamos el módulo M)
+    mov [random_number], eax  ; Almacenamos el número aleatorio generado en 'random_number'
+
+    ; Fin del programa, solo para Linux
+    mov eax, 1            ; syscall para salir (exit)
+    xor ebx, ebx          ; código de salida 0
+    int 0x80              ; invoca el syscall
