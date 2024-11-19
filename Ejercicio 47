@@ -1,0 +1,35 @@
+========================================== 
+% Autor: De La Teja Gonzalez Miguel Adolfo 
+% Fecha: 6 de Noviembre de 2024 
+% Descripción: 50 ejercicios 
+% ===============================================
+
+Detección de desbordamiento en suma	
+
+section .data
+    num1 dd 0x7FFFFFFF    ; Primer número (valor alto positivo para ejemplo de desbordamiento)
+    num2 dd 0x1           ; Segundo número (número pequeño que provoca desbordamiento)
+
+section .text
+    global _start
+
+_start:
+    ; Cargar los números en los registros
+    mov eax, [num1]       ; Cargar el primer número en eax
+    add eax, [num2]       ; Sumar el segundo número a eax
+
+    ; Verificar si ocurrió desbordamiento
+    jo overflow_detected  ; Si la flag OF está activa, saltamos a overflow_detected
+
+    ; Si no hubo desbordamiento, continuar aquí
+    mov ebx, 1            ; Código de salida para "sin desbordamiento"
+    jmp end_program       ; Saltamos al final
+
+overflow_detected:
+    ; Si hubo desbordamiento, continuar aquí
+    mov ebx, 2            ; Código de salida para "desbordamiento detectado"
+
+end_program:
+    ; Salida del programa (solo para Linux)
+    mov eax, 1            ; syscall número 1 para la salida del programa
+    int 0x80              ; llamar al kernel para salir
