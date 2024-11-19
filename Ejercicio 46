@@ -1,0 +1,54 @@
+========================================== 
+% Autor: De La Teja Gonzalez Miguel Adolfo 
+% Fecha: 6 de Noviembre de 2024 
+% Descripción: 50 ejercicios 
+% ===============================================
+
+Encontrar prefijo común más largo en cadenas	
+
+section .data
+    string1 db "abcdefg", 0    ; Primera cadena
+    string2 db "abcxyz", 0      ; Segunda cadena
+    result db 10 dup(0)         ; Buffer para almacenar el prefijo común
+
+section .text
+    global _start
+
+_start:
+    ; Inicializamos los punteros a las cadenas
+    lea esi, [string1]   ; Puntero a la primera cadena (string1)
+    lea edi, [string2]   ; Puntero a la segunda cadena (string2)
+    lea ebx, [result]    ; Puntero al buffer para el resultado
+
+    ; Comienza el ciclo de comparación de los caracteres de ambas cadenas
+compare_loop:
+    mov al, [esi]        ; Cargar el siguiente carácter de la cadena 1
+    mov dl, [edi]        ; Cargar el siguiente carácter de la cadena 2
+
+    ; Verificamos si ambos caracteres son iguales
+    cmp al, dl
+    jne end_comparison   ; Si son diferentes, terminamos el ciclo
+
+    ; Si son iguales, copiamos el carácter al resultado
+    mov [ebx], al
+    inc esi              ; Avanzamos al siguiente carácter de string1
+    inc edi              ; Avanzamos al siguiente carácter de string2
+    inc ebx              ; Avanzamos al siguiente espacio en el buffer
+
+    ; Si hemos llegado al final de cualquiera de las cadenas, terminamos
+    cmp al, 0
+    je end_comparison
+    cmp dl, 0
+    je end_comparison
+
+    ; Continuar el ciclo de comparación
+    jmp compare_loop
+
+end_comparison:
+    ; Agregar un terminador nulo al final del prefijo común
+    mov byte [ebx], 0
+
+    ; Salida del programa (solo para Linux)
+    mov eax, 1           ; syscall número 1 para la salida del programa
+    mov ebx, 0           ; código de salida 0
+    int 0x80             ; Llamada al kernel para salir
