@@ -1,0 +1,38 @@
+% =============================================== 
+% Autor: De La Teja Gonzalez Miguel Adolfo 
+% Fecha: 6 de Noviembre de 2024 
+% Descripción: 50 ejercicios 
+% ===============================================
+
+Suma de elementos en un arreglo	
+
+section .data
+    array dd 1, 2, 3, 4, 5   ; Arreglo de números (puedes cambiar los valores)
+    len equ 5                ; Longitud del arreglo
+    sum resd 1               ; Variable para almacenar el resultado de la suma
+
+section .text
+    global _start
+
+_start:
+    ; Inicialización
+    xor eax, eax             ; Limpia eax, que usaremos para la suma
+    xor ecx, ecx             ; Limpia ecx, que será el índice del arreglo
+
+sum_loop:
+    cmp ecx, len             ; ¿Hemos procesado todos los elementos?
+    jge end_loop             ; Si es >= len, salir del ciclo
+
+    ; Sumar elemento del arreglo
+    add eax, [array + ecx*4] ; Suma el elemento actual al acumulador (eax)
+
+    inc ecx                  ; Incrementa el índice
+    jmp sum_loop             ; Repite el ciclo
+
+end_loop:
+    mov [sum], eax           ; Almacena el resultado en la variable 'sum'
+
+    ; Salida del programa (solo para Linux)
+    mov eax, 1               ; syscall número 1 para la salida del programa
+    xor ebx, ebx             ; Código de salida 0
+    int 0x80                 ; Llama al kernel para salir
