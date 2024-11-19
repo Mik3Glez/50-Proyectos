@@ -1,0 +1,47 @@
+% =============================================== 
+% Autor: De La Teja Gonzalez Miguel Adolfo 
+% Fecha: 6 de Noviembre de 2024 
+% Descripción: 50 ejercicios 
+% ===============================================
+
+Mínimo Común Múltiplo (MCM)	
+
+section .data
+    num1 dd 48       ; Primer número
+    num2 dd 36       ; Segundo número
+    result dd 0      ; Almacena el resultado del MCM
+
+section .text
+    global _start
+
+_start:
+    ; Cargar los números en los registros
+    mov eax, [num1]    ; eax = num1
+    mov ebx, [num2]    ; ebx = num2
+
+    ; Guardar los valores originales para el cálculo del MCM
+    mov esi, eax       ; esi = num1 (copia de num1)
+    mov edi, ebx       ; edi = num2 (copia de num2)
+
+    ; Calcular el MCD usando el algoritmo de Euclides
+euclid:
+    cmp ebx, 0         ; ¿ebx (num2) es 0?
+    je calculate_mcm   ; Si es 0, terminamos y el MCD está en eax
+    xor edx, edx       ; Limpiar el registro edx para la división
+    div ebx            ; eax = eax / ebx, resto en edx
+    mov eax, ebx       ; eax = ebx (nuevo dividendo)
+    mov ebx, edx       ; ebx = edx (nuevo divisor)
+    jmp euclid         ; Repetir hasta que el divisor sea 0
+
+calculate_mcm:
+    ; eax ahora contiene el MCD
+    ; Calcular MCM = (num1 * num2) / MCD
+    mov eax, esi       ; eax = num1 (copia original)
+    mul edi            ; eax = num1 * num2 (resultado parcial en edx:eax)
+    div ecx            ; eax = resultado / MCD (ecx contiene MCD)
+    mov [result], eax  ; Guardar el MCM en la memoria
+
+    ; Salir del programa (para Linux)
+    mov eax, 1         ; syscall número 1 para salir
+    xor ebx, ebx       ; código de salida 0
+    int 0x80           ; llamada al kernel
